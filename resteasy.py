@@ -16,14 +16,13 @@ def mongo_to_jsonResponse(mongobj):
 
 
 @app.route('/api/menus', methods=['GET'])
-def get_tasks():
-    # tasks_ids = mongo.db.tasks.insert(tasks)
+def get_menus():
     all_menus = mongo.db.menus.find()
     return mongo_to_jsonResponse(all_menus)
 
 
 @app.route('/api/menus/<menu_id>', methods=['GET'])
-def get_task(menu_id):
+def get_menu(menu_id):
     #check if menu_id coming in from URL is a valid ObjectId format
     if (ObjectId.is_valid(menu_id)):
         menu = mongo.db.menus.find_one_or_404({'_id': ObjectId(menu_id)})
@@ -34,7 +33,7 @@ def get_task(menu_id):
 
 
 @app.route('/api/menus', methods=['POST'])
-def create_task():
+def create_menu():
     if not request.json or not 'menu_name' in request.json:
         abort(400)
     menu = {
@@ -49,7 +48,7 @@ def create_task():
 
 
 @app.route('/api/menus/<menu_id>', methods=['PUT'])
-def update_task(menu_id):
+def update_menu(menu_id):
     #check if menu_id coming in from URL is a valid ObjectId format
     if (ObjectId.is_valid(menu_id)):
         menu = mongo.db.menus.find_one_or_404({'_id': ObjectId(menu_id)})
@@ -61,6 +60,7 @@ def update_task(menu_id):
     if 'menu_name' in request.json and type(request.json['menu_name']) != unicode:
         abort(400)
 
+    #update using request json variable, if not present use current one in the db.
     mongo.db.menus.update({'_id': ObjectId(menu_id)},
         {"$set":{'menu_name': request.json.get('menu_name',menu['menu_name']),
                'URL': request.json.get('URL', menu['URL']),
@@ -72,7 +72,7 @@ def update_task(menu_id):
 
 
 @app.route('/api/menus/<menu_id>', methods=['DELETE'])
-def delete_task(menu_id):
+def delete_menu(menu_id):
     #check if menu_id coming in from URL is a valid ObjectId format
     if (ObjectId.is_valid(menu_id)):
         mongo.db.menus.find_one_or_404({'_id': ObjectId(menu_id)})
